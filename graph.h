@@ -4,6 +4,50 @@ using namespace std;
 #ifndef Graph_H
 #define Graph_H
 
+// GLOBAL VARIABLES
+int menu = 1;
+int example = 1;
+int numNode = 0;
+
+void start()
+{
+	cout << "#### MENU LIST" << endl;
+	cout << "1. Create your own graph" << endl;
+	cout << "2. Create from examples" << endl << endl;
+
+	do
+	{
+		cout << "Select menu item: ";
+		cin >> menu;
+	} while (menu != 1 && menu != 2);
+
+	cout << "\n-------------------------------\n\n";
+
+	if (menu == 1)
+	{
+		cout << "How many nodes: ";
+		cin >> numNode;
+		cout << endl;
+	}
+	else if (menu == 2)
+	{
+		cout << "Select example (1-5): ";
+		cin >> example;
+		cout << endl;
+
+		if (example == 1)
+			numNode = 5;
+		else if (example == 2)
+			numNode = 4;
+		else if (example == 3)
+			numNode = 5;
+		else if (example == 4)
+			numNode = 7;
+		else if (example == 5)
+			numNode = 9;
+	}
+}
+
 class Edges;
 
 class NodeData
@@ -21,16 +65,13 @@ public:
 class Edges
 {
 public:
-	Edges()
-	{
-		weight = 0;
-	}
+	Edges();
 	Edges(int w)
 	{
 		weight = w;
 	}
-	int weight;
-	NodeData *edge;
+	int weight = 0;
+	NodeData *edge = NULL;
 };
 
 class Graph
@@ -40,15 +81,31 @@ public:
 	Graph(int num)
 	{
 		numNode = num;
+		char_ascii = 65; // ini tialize char 'A' using ASCII = 65
+		arrPtr = new NodeData*[numNode]; // create an array to store pointers of each 'NodeData' i.e. A, B, C, ...
+		matrix = new int*[numNode]; // create two dimentional dynamic array of adjacency matrix (SIZE = numNode*numNode)
+		path = new float[numNode]; // store the latest cost (shortest path) of every nodes
+		status = false; // a 'status' to check & answer questions
+	}
+	~Graph()
+	{
+		for (int i = 0; i < numNode; i++)
+		{
+			delete[] matrix[i];
+		}
+		delete[] arrPtr;
+		delete[] matrix;
+		delete[] path;
+		arrPtr = NULL;
+		matrix = NULL;
+		path = NULL;
 	}
 	void init()
 	{
 		for (int i = 0; i < numNode; i++)
 		{
-			graph.push_back(char_ascii); // push the 'NodeData' into the graph
-			arrPtr_Graph[i] = &graph.back(); // keep its address to a temporary array called 'arrPtr_Graph'
-			path.push_back(char_ascii++); // push the 'NodeData' into the path as well
-			arrPtr_Path[i] = &path.back(); // keep its address to a temporary array called 'arrPtr_Path'
+			graph.push_back(char_ascii++); // push the 'NodeData' into the graph
+			arrPtr[i] = &graph.back(); // keep its address to a temporary array called 'arrPtr'
 		}
 	}
 	void create_matrix()
@@ -64,6 +121,275 @@ public:
 			cout << endl;
 		}
 	}
+	void create_matrix_withValue(int item)
+	{
+		for (int i = 0; i < numNode; i++)
+		{
+			matrix[i] = new int[numNode];
+		}
+
+		if (item == 1)
+		{
+			matrix[0][0] = 0;
+			matrix[0][1] = 2;
+			matrix[0][2] = 0;
+			matrix[0][3] = 0;
+			matrix[0][4] = 0;
+
+			matrix[1][0] = 0;
+			matrix[1][1] = 0;
+			matrix[1][2] = 3;
+			matrix[1][3] = 4;
+			matrix[1][4] = 0;
+
+			matrix[2][0] = 0;
+			matrix[2][1] = 0;
+			matrix[2][2] = 0;
+			matrix[2][3] = 0;
+			matrix[2][4] = 7;
+
+			matrix[3][0] = 0;
+			matrix[3][1] = 0;
+			matrix[3][2] = 0;
+			matrix[3][3] = 0;
+			matrix[3][4] = 0;
+
+			matrix[4][0] = 0;
+			matrix[4][1] = 0;
+			matrix[4][2] = 0;
+			matrix[4][3] = 0;
+			matrix[4][4] = 0;
+		}
+
+		/////////////////////////////////////////////////////////////
+
+		else if (item == 2)
+		{
+			matrix[0][0] = 0;
+			matrix[0][1] = 2;
+			matrix[0][2] = 3;
+			matrix[0][3] = 0;
+
+			matrix[1][0] = 0;
+			matrix[1][1] = 0;
+			matrix[1][2] = 0;
+			matrix[1][3] = 3;
+
+			matrix[2][0] = 0;
+			matrix[2][1] = 1;
+			matrix[2][2] = 0;
+			matrix[2][3] = 2;
+
+			matrix[3][0] = 0;
+			matrix[3][1] = 0;
+			matrix[3][2] = 0;
+			matrix[3][3] = 0;
+		}
+
+		/////////////////////////////////////////////////////////////
+
+		else if (item == 3)
+		{
+			matrix[0][0] = 0;
+			matrix[0][1] = 2;
+			matrix[0][2] = 0;
+			matrix[0][3] = 0;
+			matrix[0][4] = 0;
+
+			matrix[1][0] = 0;
+			matrix[1][1] = 0;
+			matrix[1][2] = 2;
+			matrix[1][3] = 1;
+			matrix[1][4] = 0;
+
+			matrix[2][0] = 0;
+			matrix[2][1] = 0;
+			matrix[2][2] = 0;
+			matrix[2][3] = 0;
+			matrix[2][4] = 1;
+
+			matrix[3][0] = 0;
+			matrix[3][1] = 0;
+			matrix[3][2] = 0;
+			matrix[3][3] = 0;
+			matrix[3][4] = 3;
+
+			matrix[4][0] = 0;
+			matrix[4][1] = 0;
+			matrix[4][2] = 0;
+			matrix[4][3] = 0;
+			matrix[4][4] = 0;
+		}
+
+		/////////////////////////////////////////////////////////////
+
+		else if (item == 4)
+		{
+			matrix[0][0] = 0;
+			matrix[0][1] = 2;
+			matrix[0][2] = 3;
+			matrix[0][3] = 2;
+			matrix[0][4] = 0;
+			matrix[0][5] = 0;
+			matrix[0][6] = 0;
+
+			matrix[1][0] = 0;
+			matrix[1][1] = 0;
+			matrix[1][2] = 0;
+			matrix[1][3] = 0;
+			matrix[1][4] = 1;
+			matrix[1][5] = 0;
+			matrix[1][6] = 0;
+
+			matrix[2][0] = 0;
+			matrix[2][1] = 0;
+			matrix[2][2] = 0;
+			matrix[2][3] = 0;
+			matrix[2][4] = 2;
+			matrix[2][5] = 0;
+			matrix[2][6] = 0;
+
+			matrix[3][0] = 0;
+			matrix[3][1] = 0;
+			matrix[3][2] = 0;
+			matrix[3][3] = 0;
+			matrix[3][4] = 0;
+			matrix[3][5] = 2;
+			matrix[3][6] = 0;
+
+			matrix[4][0] = 0;
+			matrix[4][1] = 0;
+			matrix[4][2] = 0;
+			matrix[4][3] = 0;
+			matrix[4][4] = 0;
+			matrix[4][5] = 0;
+			matrix[4][6] = 3;
+
+			matrix[5][0] = 0;
+			matrix[5][1] = 0;
+			matrix[5][2] = 0;
+			matrix[5][3] = 0;
+			matrix[5][4] = 0;
+			matrix[5][5] = 0;
+			matrix[5][5] = 0;
+			matrix[5][6] = 2;
+
+			matrix[6][0] = 0;
+			matrix[6][1] = 0;
+			matrix[6][2] = 0;
+			matrix[6][3] = 0;
+			matrix[6][4] = 0;
+			matrix[6][5] = 0;
+			matrix[6][5] = 0;
+			matrix[6][6] = 0;
+		}
+
+		/////////////////////////////////////////////////////////////
+
+		else if (item == 5)
+		{
+			matrix[0][0] = 0;
+			matrix[0][1] = 0;
+			matrix[0][2] = 9;
+			matrix[0][3] = 17;
+			matrix[0][4] = 0;
+			matrix[0][5] = 0;
+			matrix[0][6] = 0;
+			matrix[0][7] = 0;
+			matrix[0][8] = 0;
+
+			matrix[1][0] = 5;
+			matrix[1][1] = 0;
+			matrix[1][2] = 0;
+			matrix[1][3] = 0;
+			matrix[1][4] = 0;
+			matrix[1][5] = 0;
+			matrix[1][6] = 0;
+			matrix[1][7] = 0;
+			matrix[1][8] = 0;
+
+			matrix[2][0] = 0;
+			matrix[2][1] = 0;
+			matrix[2][2] = 0;
+			matrix[2][3] = 0;
+			matrix[2][4] = 0;
+			matrix[2][5] = 12;
+			matrix[2][6] = 0;
+			matrix[2][7] = 0;
+			matrix[2][8] = 0;
+
+			matrix[3][0] = 0;
+			matrix[3][1] = 11;
+			matrix[3][2] = 6;
+			matrix[3][3] = 0;
+			matrix[3][4] = 7;
+			matrix[3][5] = 0;
+			matrix[3][6] = 0;
+			matrix[3][7] = 0;
+			matrix[3][8] = 0;
+
+			matrix[4][0] = 0;
+			matrix[4][1] = 0;
+			matrix[4][2] = 0;
+			matrix[4][3] = 0;
+			matrix[4][4] = 0;
+			matrix[4][5] = 0;
+			matrix[4][6] = 6;
+			matrix[4][7] = 0;
+			matrix[4][8] = 0;
+
+			matrix[5][0] = 0;
+			matrix[5][1] = 0;
+			matrix[5][2] = 0;
+			matrix[5][3] = 0;
+			matrix[5][4] = 0;
+			matrix[5][5] = 0;
+			matrix[5][6] = 3;
+			matrix[5][7] = 0;
+			matrix[5][8] = 0;
+
+			matrix[6][0] = 0;
+			matrix[6][1] = 0;
+			matrix[6][2] = 0;
+			matrix[6][3] = 0;
+			matrix[6][4] = 0;
+			matrix[6][5] = 0;
+			matrix[6][6] = 0;
+			matrix[6][7] = 5;
+			matrix[6][8] = 4;
+
+			matrix[7][0] = 0;
+			matrix[7][1] = 0;
+			matrix[7][2] = 0;
+			matrix[7][3] = 0;
+			matrix[7][4] = 0;
+			matrix[7][5] = 0;
+			matrix[7][6] = 0;
+			matrix[7][7] = 0;
+			matrix[7][8] = 0;
+
+			matrix[8][0] = 0;
+			matrix[8][1] = 0;
+			matrix[8][2] = 0;
+			matrix[8][3] = 0;
+			matrix[8][4] = 0;
+			matrix[8][5] = 0;
+			matrix[8][6] = 0;
+			matrix[8][7] = 3;
+			matrix[8][8] = 0;
+		}
+
+		/////////////////////////////////////////////////////////////
+
+		for (int i = 0; i < numNode; i++)
+		{
+			for (int j = 0; j < numNode; j++)
+			{
+				cout << "Input matrix[" << i << "][" << j << "]: " << matrix[i][j] << endl;
+			}
+			cout << endl;
+		}
+	}
 	void create_list()
 	{
 		int i = 0;
@@ -74,7 +400,7 @@ public:
 				if (matrix[i][j] != 0) // just push a weighted 'Edges' into its list 'edge' EXCEPT: 0 (zero)
 				{
 					it->edges.push_back(matrix[i][j]);
-					it->edges.back().edge = arrPtr_Graph[j]; // point that 'Edges' toward to the 'NodeData' that it connected with
+					it->edges.back().edge = arrPtr[j]; // point that 'Edges' toward to the 'NodeData' that it connected with
 				}
 			}
 			i++;
@@ -87,12 +413,12 @@ public:
 		cout << "\t  ";
 		for (int i = 0; i < numNode; i++)
 		{
-			cout << arrPtr_Graph[i]->data << " "; // print the first row headline: A B C ...
+			cout << arrPtr[i]->data << " "; // print the first row headline: A B C ...
 		}
 		cout << endl;
 		for (int i = 0; i < numNode; i++)
 		{
-			cout << "\t" << arrPtr_Graph[i]->data << " "; // print the first column: A B C ...
+			cout << "\t" << arrPtr[i]->data << " "; // print the first column: A B C ...
 			for (int j = 0; j < numNode; j++)
 			{
 				cout << matrix[i][j]; // print all data in the adjacency matrix
@@ -107,8 +433,8 @@ public:
 		cout << "#### Adjacency linked list\n\n";
 		for (int i = 0; i < numNode; i++) // iterate the graph
 		{
-			cout << "\t" << arrPtr_Graph[i]->data << " "; // print the name of each 'NodeData'
-			for (list<Edges>::iterator it = arrPtr_Graph[i]->edges.begin(); it != arrPtr_Graph[i]->edges.end(); it++) // iterate the list 'edges'
+			cout << "\t" << arrPtr[i]->data << " "; // print the name of each 'NodeData'
+			for (list<Edges>::iterator it = arrPtr[i]->edges.begin(); it != arrPtr[i]->edges.end(); it++) // iterate the list 'edges'
 			{
 				cout << "[" << it->weight << "->" << it->edge->data << "] -> "; // print the list 'edges' of each 'NodeData'
 			}
@@ -141,10 +467,10 @@ public:
 		status = false; // reset defalut 'status' to FALSE
 		for (int i = 0; i < numNode; i++) // iterate the graph
 		{
-			for (list<Edges>::iterator it = arrPtr_Graph[i]->edges.begin(); it != arrPtr_Graph[i]->edges.end(); it++) // iterate the list 'edges'
+			for (list<Edges>::iterator it = arrPtr[i]->edges.begin(); it != arrPtr[i]->edges.end(); it++) // iterate the list 'edges'
 			{
 				list<Edges>::iterator tmp = it;
-				for (list<Edges>::iterator it2 = ++tmp; it2 != arrPtr_Graph[i]->edges.end(); it2++)
+				for (list<Edges>::iterator it2 = ++tmp; it2 != arrPtr[i]->edges.end(); it2++)
 				{
 					if (it->edge == it2->edge)
 					{
@@ -230,183 +556,121 @@ public:
 		}
 		return status;
 	}
-	NodeData* ptr_graph(char el)
-	{
-		for (int i = 0; i < numNode; i++)
-		{
-			if (arrPtr_Graph[i]->data == el)
-			{
-				return arrPtr_Graph[i];
-			}
-		}
-	}
 	NodeData* ptr_path(char el)
 	{
+		NodeData *tmp = NULL;
 		for (int i = 0; i < numNode; i++)
 		{
-			if (arrPtr_Path[i]->data == el)
+			if (arrPtr[i]->data == el)
 			{
-				return arrPtr_Path[i];
+				tmp = arrPtr[i];
 			}
 		}
+		return tmp;
 	}
-	void shortest_path(char el)
+	int index_path(char el)
 	{
-		for (list<NodeData>::iterator it = path.begin(); it != path.end(); it++)
+		int index = 0;
+		for (int i = 0; i < numNode; i++)
 		{
-			it->edges.push_back(Edges(0));
-		}
-
-		/*for (list<Edges>::iterator it = ptr_graph(el)->edges.begin(); it != ptr_graph(el)->edges.end(); it++)
-		{
-			ptr_path(it->edge->data)->edges.push_back(it->weight);
-		}*/
-		int count1 = 0;
-		while (count1 < numNode)
-		{
-			int count2 = 0;
-			list<Edges>::iterator it_tmp = ptr_graph(el)->edges.begin();
-			while (count2 < numNode)
+			if (arrPtr[i]->data == el)
 			{
-				if (it_tmp->edge->data == arrPtr_Path[count2]->data)
-				{
-					arrPtr_Path[count2]->edges.push_back(Edges(it_tmp->weight));
-					if (it_tmp != ptr_graph(el)->edges.end())
-					{
-						it_tmp++;
-					}
-				}
-				else
-				{
-					arrPtr_Path[count2]->edges.push_back(Edges(0));
-				}
-				count2++;
+				index = i;
+				break;
 			}
-			count1++;
 		}
-
-
-
-
-		///////////////////////////////////////////////////////////////////////////////
-
-		start from 'A'
-			'A' // started node
-			'C'.push(9)
-			'D'.push(17)
-			--->min(9C, 17D) = 9C;
-		visit node 'C'
-			'A' // started node
-			'C' // v.ing
-			'D'.push(17)
-			'F'.push(9 + 12) // 21
-			--->min(17D, 21F) = 17D;
-		visit node 'D'
-			'A' // started node
-			'B'.push(17 + 11) // 28
-			'C' // v.ed
-			'D' // v.ing
-			'E'.push(17 + 7) // 24
-			'F'.push(21)
-			--->min(28B, 24E, 21F) = 21F;
-		visit node 'F'
-			'A' // started node
-			'B'.push(28)
-			'C' // v.ed
-			'D' // v.ed
-			'E'.push(24)
-			'F' // v.ing
-			'G'.push(21 + 3) // 24
-			--->min(28B, 24E, 24G) = 24E;
-		visit node 'E'
-			'A' // started node
-			'B'.push(28)
-			'C' // v.ed
-			'D' // v.ed
-			'E' // v.ing
-			'F' // v.ed
-			'G'.push(24) // 'G'.push(24 + 6) -- 30 > 24
-			--->min(28B, 24G) = 24G;
-		visit node 'G'
-			'A' // started node
-			'B'.push(28)
-			'C' // v.ed
-			'D' // v.ed
-			'E' // v.ed
-			'F' // v.ed
-			'G' // v.ing
-			'H'.push(24 + 5) // 29
-			'I'.push(24 + 4) // 28
-			--->min(28B, 29H, 28I) = 28B;
-		visit node 'B'
-			'A' // started node
-			'B' // v.ing
-			'C' // v.ed
-			'D' // v.ed
-			'E' // v.ed
-			'F' // v.ed
-			'G' // v.ed
-			'H'.push(29)
-			'I'.push(28)
-			--->min(29H, 28I) = 28I;
-		visit node 'I'
-			'A' // started node
-			'B' // v.ed
-			'C' // v.ed
-			'D' // v.ed
-			'E' // v.ed
-			'F' // v.ed
-			'G' // v.ed
-			'H'.push(29) // 'H'.push(28 + 3) -- 31 > 29
-			'I' // v.ing
-			--->min(29H) = 29H;
-		visit node 'H'
-			'A' // started node
-			'B' // v.ed
-			'C' // v.ed
-			'D' // v.ed
-			'E' // v.ed
-			'F' // v.ed
-			'G' // v.ed
-			'H' // v.ing
-			'I' // v.ed
-
-		///////////////////////////////////////////////////////////////////////////////
-
-
-
-
+		return index;
+	}
+	bool findInVisited(char el)
+	{
+		for (list<NodeData>::iterator it = visited.begin(); it != visited.end(); it++)
+		{
+			if (it->data == el)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	int indexOfMin()
+	{
+		bool firstTime = true;
+		int min = INFINITY;
+		int index = 0;
+		for (int i = 0; i < numNode; i++)
+		{
+			if (!findInVisited(arrPtr[i]->data))
+			{
+				if (firstTime && (path[i] != INFINITY)) // The first, set 'min'
+				{
+					min = path[i];
+					index = i;
+					firstTime = false;
+				}
+				
+				if (path[i] < min)
+				{
+					min = path[i];
+					index = i;
+				}
+			}
+		}
+		return index;
+	}
+	void shortest_path()
+	{
+		char el;
 		cout << "\n-------------------------------\n\n";
 		cout << "#### Dijkstra's Algorithm\n\n";
-		cout << "\tStarts from node: " << ptr_graph(el)->data;
-		cout << "\n\n\tIteration\t\init";
-		for (int i = 1; i <= numNode; i++)
+
+		do
 		{
-			cout << " " << i;
+			cout << "\tStarts from node: ";
+			cin >> el;
+			el = toupper(el);
+		} while (ptr_path(el) == NULL);
+
+
+		for (int i = 0; i < numNode; i++)
+		{
+			path[i] = INFINITY;
 		}
-		cout << "\n\tActive vertex\t    ";
-		/*for (int i = 0; i < numNode; i++)
+		path[index_path(el)] = 0; // set distance of start node is zero
+
+		visited.push_back(*ptr_path(el)); // visit start node first
+		
+		int i = index_path(el);
+		for (int count = 0; count < numNode; count++)
 		{
-			cout << " " << arrPtr_Graph[i]->data;
-		}*/
-		for (list<NodeData>::iterator it = path.begin(); it != path.end(); it++)
-		{
-			cout << "\n\t" << it->data << "\t\t  ";
-			for (list<Edges>::iterator it2 = it->edges.begin(); it2 != it->edges.end(); it2++)
+			for (int j = 0; j < numNode; j++)
 			{
-				cout << " " << it2->weight;
+				if (!findInVisited(arrPtr[j]->data) && (matrix[i][j] != 0))
+				{
+					if ((path[i] + matrix[i][j]) < path[j])
+					{
+						path[j] = path[i] + matrix[i][j];
+					}
+				}
 			}
+			i = indexOfMin();
+			visited.push_back(*ptr_path(arrPtr[i]->data));
+			//cout << arrPtr[i]->data;
+		}
+
+		for (int i = 0; i < numNode; i++)
+		{
+			cout << "\t" << ptr_path(el)->data << " --> " << arrPtr[i]->data << " = " << path[i] << endl;
 		}
 	}
 
 	int numNode;
 	list<NodeData> graph;
-	list<NodeData> path; // prepare for the dijkstra's algorithm
-	int char_ascii = 65; // ini tialize char 'A' using ASCII = 65
-	NodeData **arrPtr_Graph = new NodeData*[numNode]; // create an array to store pointers of each 'NodeData' in 'graph'
-	NodeData **arrPtr_Path = new NodeData*[numNode]; // create an array to store pointers of each 'NodeData' in 'path'
-	int **matrix = new int*[numNode]; // create two dimentional dynamic array of adjacency matrix (SIZE = numNode*numNode)
-	bool status = false; // a 'status' to check & answer questions
+	int char_ascii;
+	NodeData **arrPtr;
+	int **matrix;
+	bool status;
+	float *path;
+	list<NodeData> visited; // keep visited nodes into the list
 };
 
 #endif // Graph_H
